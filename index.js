@@ -2,6 +2,7 @@
 const { select, input, checkbox } = require('@inquirer/prompts')
 
 // Declaração das variáveis globais
+let mensagem = "Bem-Vindo ao Gerenciador de Metas"
 let meta = {
     value: "Ler 1 livro",
     checked: false
@@ -22,7 +23,7 @@ const deletarMetas = async() => {
         instructions: false // Remove instruções padrão do inquirer
     }) 
     if (metasParaExclusao.length == 0) {
-        console.log ("Nenhuma meta foi excluída.")
+        mensagem = "Nenhuma meta foi excluída."
         return
     }
 
@@ -43,7 +44,7 @@ const metasAbertas = async() => {
         return !meta.checked
     })
     if(abertas.length == 0) {
-        console.log("Parabéns, Você concluiu todas metas!")
+        mensagem = "Parabéns, Você concluiu todas metas!"
         return
     }
 
@@ -60,7 +61,7 @@ const metasRealizadas = async () => {
         return meta.checked
     })
     if(realizadas.length == 0) {
-        console.log ("Você ainda não concluiu nenhuma meta.")
+        mensagem = "Você ainda não concluiu nenhuma meta."
         return
     }
 
@@ -83,7 +84,7 @@ const listarMetas = async() => {
 
     // Resposta caso nenhuma meta seja marcada como realizada
     if (respostas.length == 0){
-        console.log("Você não marcou nenhuma meta como realizada.")
+        mensagem = "Você não marcou nenhuma meta como realizada."
         return
     }
 
@@ -96,7 +97,7 @@ const listarMetas = async() => {
         meta.checked = true
     })
 
-    console.log("Alterações Salvas!")
+    mensagem = "Alterações Salvas!"
 }
 const cadastrarMeta = async() => {
 
@@ -105,15 +106,25 @@ const cadastrarMeta = async() => {
 
     // Caso nada seja escrito, retorna ao menu principal
     if(meta.length == 0) {
-        console.log("Você não digitou uma meta!")
+        mensagem = ("Você não inseriu nenhuma meta!")
         return
     }
     else {
-        console.log ("Meta cadastrada!")
+        mensagem = ("Meta cadastrada!")
     }
 
     // Insere a nova meta no array "metas"
     metas.push ({value: meta, checked: false})
+}
+const mostrarMensagem = () => {
+
+    // Limpa o terminal e mostra uma mensagem, caso a função mostre uma
+    console.clear()
+    if (mensagem != ""){
+        console.log(mensagem)
+        console.log("")
+        mensagem = ""
+    }
 }
 const start = async() => {
 
@@ -122,7 +133,7 @@ const start = async() => {
     while(true){
         // O código usa a função "select" do pacote importado para mostrar uma lista com opções
         // O código aguarda (await) a seleção e retorna o valor da opção escolhida
-
+        mostrarMensagem()
         const opcao = await select ({
             message: "Menu >",
             choices: [
@@ -158,7 +169,7 @@ const start = async() => {
             // Cada case espera sua função ser realizada por completo antes de retornar para o menu
             case "cadastrar":
                 await cadastrarMeta()
-                break
+                breakbreak li9ne javascript
 
             case "listar":
                 await listarMetas()
