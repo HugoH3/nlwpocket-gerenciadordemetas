@@ -10,11 +10,45 @@ let metas = [ meta ]
 
 // Declaração das funções do código
 
+const metasAbertas = async() => {
+
+    const abertas = metas.filter((meta) => {
+
+        // A meta é adicionada a array "abertas" se o seu valor booleano INVERTIDO for verdadeiro, ou sejam se "metas.checked" for falso, retorna true.
+        return !meta.checked
+    })
+    if(abertas.length == 0) {
+        console.log("Parabéns, Você concluiu todas metas!")
+        return
+    }
+
+    await select ({
+        message: "Metas realizadas: " + abertas.length,
+        choices: [...abertas]
+    })
+    
+}
+const metasRealizadas = async () => {
+
+    const realizadas = metas.filter ((meta) => {
+        // A meta é adicionada a array "realizadas" se o retorno for true.
+        return meta.checked
+    })
+    if(realizadas.length == 0) {
+        console.log ("Você ainda não concluiu nenhuma meta.")
+        return
+    }
+
+    await select ({
+        message: "Metas realizadas: " + realizadas.length,
+        choices: [...realizadas]
+    })
+}
 const listarMetas = async() => {
     const respostas = await checkbox({
         message: "Navegue até a meta escolhida e use espaço para marcar ou desmarcar como concluida. Pressione enter para salvar suas alterações",
         choices: [...metas],
-        instructions: false, // Removendo instruções padrão do inquirer
+        instructions: false // Remove instruções padrão do inquirer
     })
 
     // Atribui o valor false para TODAS as metas
@@ -22,8 +56,9 @@ const listarMetas = async() => {
         m.checked = false
     })
 
+    // Resposta caso nenhuma meta seja marcada como realizada
     if (respostas.length == 0){
-        console.log("Nenhuma meta foi selecionada!")
+        console.log("Você não marcou nenhuma meta como realizada.")
         return
     }
 
@@ -55,14 +90,13 @@ const cadastrarMeta = async() => {
     // Insere a nova meta no array "metas"
     metas.push ({value: meta, checked: false})
 }
-
 const start = async() => {
 
     // Laço de repetição para o menu do programa
 
     while(true){
         // O código usa a função "select" do pacote importado para mostrar uma lista com opções
-        // O código aguarda (await) a seleção e retorna a opção escolhida
+        // O código aguarda (await) a seleção e retorna o valor da opção escolhida
 
         const opcao = await select ({
             message: "Menu >",
@@ -76,6 +110,14 @@ const start = async() => {
                     value: "listar"
                 },
                 {
+                    name: "Metas realizadas",
+                    value: "realizadas"
+                },
+                {
+                    name: "Metas abertas",
+                    value: "abertas"
+                },
+                {
                     name: "Sair",
                     value: "sair"
                 }
@@ -83,18 +125,22 @@ const start = async() => {
         })
 
         switch(opcao){
+            // Cada case espera sua função ser realizada por completo antes de retornar para o menu
             case "cadastrar":
-
-                // Espera até que a função async "cadastrarMeta" seja executada por completo
                 await cadastrarMeta()
                 console.log(metas)
                 break
 
             case "listar":
-                // Espera até que a função async "listarMetas" seja executada por completo
                 await listarMetas()
                 break
 
+            case "realizadas":
+                await metasRealizadas()
+                break
+            case "abertas":
+                await metasAbertas()
+                break
             case "sair":
                 console.log ("Saindo...")
                 console.log("See you, space cowboy")
