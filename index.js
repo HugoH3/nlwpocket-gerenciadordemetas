@@ -1,16 +1,32 @@
-// Extração de códigos do pacote inquirer
+// Extração de códigos do pacote inquirer e filesystem (fs)
 const { select, input, checkbox } = require('@inquirer/prompts')
+const fs = require("fs").promises
 
-// Declaração das variáveis globais
+// Variáveis globais de mensagem e array de metas
 let mensagem = "Bem-Vindo ao Gerenciador de Metas"
-let meta = {
-    value: "Ler 1 livro",
-    checked: false
-}
-let metas = [ meta ]
+let metas
 
 // Declaração das funções do código
+const carregarMetas = async() => {
+    // Tenta importar dados do arquivo metas.json
+    try{
+        const dados = await fs.readFile("metas.json", "utf-8")
+        metas = JSON.parse(dados)
+    }
+    // Em caso de erro, a array metas fica vazia
+    catch(erro){
+        metas = []
+    }
+}
+const salvarMetas = async() => {
+    // Passa os dados inseridos no programa para o arquivo metas.json
+    await fs.writeFile("metas.json", JSON.stringify(metas, null,2))
+}
 const deletarMetas = async() => {
+    if (metas.length == 0){
+        mensagem = "Você precisa cadastrar uma meta antes."
+        return
+    }
 
     // Cria um array que clona o array "metas" e altera o valor checked para false
     const metasDesmarcadas = metas.map ((meta) => {
@@ -37,6 +53,10 @@ const deletarMetas = async() => {
     console.log("Meta(s) excluida(s) com sucesso!")
 }
 const metasAbertas = async() => {
+    if (metas.length == 0){
+        mensagem = "Você precisa cadastrar uma meta antes."
+        return
+    }
 
     const abertas = metas.filter((meta) => {
 
@@ -54,7 +74,11 @@ const metasAbertas = async() => {
     })
     
 }
-const metasRealizadas = async () => {
+const metasRealizadas = async() => {
+    if (metas.length == 0){
+        mensagem = "Você precisa cadastrar uma meta antes."
+        return
+    }
 
     const realizadas = metas.filter ((meta) => {
         // A meta é adicionada a array "realizadas" se o retorno for true.
@@ -71,8 +95,12 @@ const metasRealizadas = async () => {
     })
 }
 const listarMetas = async() => {
+    if (metas.length == 0){
+        mensagem = "Você precisa cadastrar uma meta antes."
+        return
+    }
     const respostas = await checkbox({
-        message: "Navegue até a meta escolhida e use espaço para marcar ou desmarcar como concluida. Pressione enter para salvar suas alterações",
+        message: "Navegue até a meta escolhida e use espaço para marcar ou desmarcar como concluida. Pressione enter para salvar suas alterações. ",
         choices: [...metas],
         instructions: false
     })
@@ -128,12 +156,19 @@ const mostrarMensagem = () => {
 }
 const start = async() => {
 
-    // Laço de repetição para o menu do programa
+    // Espera a função carregar as metas do arquivo json
+    await carregarMetas()
 
+    // Laço de repetição para o menu do programa
     while(true){
+
+        // Sempre espera os dados serem salvos no arquivo json
+        mostrarMensagem()
+        await salvarMetas()
+
         // O código usa a função "select" do pacote importado para mostrar uma lista com opções
         // O código aguarda (await) a seleção e retorna o valor da opção escolhida
-        mostrarMensagem()
+
         const opcao = await select ({
             message: "Menu >",
             choices: [
@@ -166,10 +201,11 @@ const start = async() => {
         })
 
         switch(opcao){
-            // Cada case espera sua função ser realizada por completo antes de retornar para o menu
+            // Cada case espera sua função o ser executadas por completo antes de voltar para o menu
+
             case "cadastrar":
                 await cadastrarMeta()
-                breakbreak li9ne javascript
+                break
 
             case "listar":
                 await listarMetas()
@@ -177,6 +213,7 @@ const start = async() => {
 
             case "realizadas":
                 await metasRealizadas()
+                await salvarMetas()
                 break
             case "abertas":
                 await metasAbertas()
