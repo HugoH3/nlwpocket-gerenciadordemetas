@@ -64,15 +64,14 @@ const metasAbertas = async() => {
         return !meta.checked
     })
     if(abertas.length == 0) {
-        mensagem = "Parabéns, Você concluiu todas metas!"
+        mensagem = "Parabéns, você concluiu todas metas!"
         return
     }
 
     await select ({
-        message: "Metas realizadas: " + abertas.length,
+        message: "Metas abertas: " + abertas.length,
         choices: [...abertas]
-    })
-    
+    }) 
 }
 const metasRealizadas = async() => {
     if (metas.length == 0){
